@@ -1,0 +1,305 @@
+class GameWindow < Gosu::Window
+  attr_accessor :last_drop, :last_rotation, :rotation_speed, :moving_speed, :last_move, :moving_speed, :score, :lines, :beep
+  def initialize(w = 640, h = 480)
+    super(w, h, false, 20)
+    @width = w
+    @height = h
+    
+    @name = "Unknown"
+    
+    self.caption = 'Txustris 0.1 Beta'
+    
+    update_background
+
+    @rotation_speed = 100
+    @moving_speed = 30
+
+    @gameover = true
+    
+    @grid = Grid.new(self)
+
+    @last_drop = Gosu::milliseconds
+    @last_rotation = Gosu::milliseconds
+    @last_move = Gosu::milliseconds
+    @last_space = Gosu::milliseconds
+    @last_esc = Gosu::milliseconds
+    
+    # GUI
+    @title_color = Gosu::Color.new(0xff000000)
+    @title_color.red = @title_color.green = @title_color.blue = 130
+    @title_color.blue = 230
+    @title_color.green = 230
+    @menu_color = Gosu::Color.new(0xff000000)
+    @menu_color.red = 100
+    @menu_color.blue = 50
+    @menu_color.green = 180
+    @menu_color_selected = Gosu::Color.new(0xff000000)
+    @menu_color_selected.red = 200
+    @menu_color_selected.blue = 50
+    @menu_color_selected.green = 140
+    
+    @font35 = Gosu::Font.new(self, Gosu::default_font_name, 35)
+    @font20 = Gosu::Font.new(self, Gosu::default_font_name, 20)
+    @font14 = Gosu::Font.new(self, Gosu::default_font_name, 14)
+    
+    
+    menu_options = [[:resume_game, "Resume game",false,false],
+                     [:new_game, "New game",true,true],
+                     [:hall_of_fame, "Hall of fame",true,false],
+                     [:exit, "Exit",true,false]]
+                     
+    @menu = Menu.new(self, menu_options, @font20, @title_color, @menu_color, @menu_color_selected)
+    
+    @hall_of_fame = HallOfFame.new(self,@font20,@title_color,@menu_color,@menu_color_selected)
+
+    @text_inputs = []
+
+    @text_inputs << TextField.new(self,@font20,@width/2 - 100, @height/2 + 50)
+
+    @beep = Gosu::Sample.new(self, "media/beep.aif")
+    @music = Gosu::Song.new(self, "media/txustris.ogg")
+
+    @screen = :menu
+    
+    @score = 0
+    @score_per_line = INITIAL_SCORE_PER_LINE
+    
+    @lines = 0
+    @level = 1
+    
+    @speed_per_level = Hash.new
+    initial_speed = INITIAL_SPEED
+    factor = 0.95
+    (1..20).each do |num|
+      @speed_per_level.merge!(num => (initial_speed *= factor).to_i)
+      factor *= 0.988
+    end
+    new_piece
+    resume!
+
+  end
+  def new_piece
+    
+    @grid.check_lines
+    Shape.active.destroy if Shape.active
+    a = Shape.new(self,@grid,
+                   PIECE_TYPES[rand(0-PIECE_TYPES.size)],
+                     :blue)
+    a.warp :top, :middle
+    a.active!
+    
+    update_speed
+  end
+  def update_speed
+    @speed = @speed_per_level[@level]
+  end
+  def score_lines(num)
+    @lines += num
+    if @lines % LINES_PER_LEVEL == 0
+      if @level != @lines / LINES_PER_LEVEL
+        update_background(@lines / LINES_PER_LEVEL)
+      end
+      @level = @lines / LINES_PER_LEVEL
+    end
+    num *= BONUS_INCREASE_FACTOR unless num == 1
+    @score_per_line = INITIAL_SCORE_PER_LINE * (@level * BONUS_INCREASE_FACTOR) * num unless @level == 1
+    @score += @score_per_line.to_i
+    @beep.play
+  end
+  def update
+    if @screen == :game then
+      unless @pause == true then
+        if button_down? Gosu::Button::KbLeft or button_down? Gosu::Button::GpLeft then
+          Shape.active.move :left
+        end
+        if button_down? Gosu::Button::KbRight or button_down? Gosu::Button::GpRight then
+          Shape.active.move :right
+    	  end
+        if button_down? Gosu::Button::KbUp or button_down? Gosu::Button::GpButton0 then
+          Shape.active.rotate
+        end
+        if button_down? Gosu::Button::KbDown then
+          Shape.active.move :down
+        end
+      end
+      if button_down? Gosu::Button::KbSpace then
+        if Gosu::milliseconds - @last_space > 500 then
+          if @pause == true then
+            resume!
+          else
+            pause!
+          end
+          @last_space = Gosu::milliseconds
+        end
+      end
+      if button_down? Gosu::Button::KbEscape
+        if Gosu::milliseconds - @last_esc > 500 then
+          menu!
+          @last_esc = Gosu::milliseconds
+        end
+      end
+    elsif @screen == :menu then
+      if button_down? Gosu::Button::KbUp or button_down? Gosu::Button::GpButton0 then
+        @menu.select(:previous)
+      end
+      if button_down? Gosu::Button::KbDown then
+        @menu.select(:next)
+      end
+      if button_down? Gosu::Button::KbSpace then
+        case @menu.selected.first
+          when :resume_game:
+            @screen = :game
+          when :new_game:
+            reset_game!
+            @screen = :game
+          when :hall_of_fame:
+            hall_of_fame!
+          when :exit:
+            close
+        end
+      end
+    elsif @screen == :game_over then
+
+      if button_down? Gosu::Button::KbEscape then
+        if Gosu::milliseconds - @last_esc > 500 then
+          @name = self.text_input.text
+          @hall_of_fame.new_record(@name, @score, @level)
+          hall_of_fame!
+          @last_esc = Gosu::milliseconds
+        end
+      end
+    else
+      if button_down? Gosu::Button::KbEscape
+        if Gosu::milliseconds - @last_esc > 500 then
+          menu!
+          @last_esc = Gosu::milliseconds
+        end
+      end
+    end
+    
+    drop_shape! unless @pause or @gameover
+    
+    keep_music! unless @gameover==true
+  end
+  def keep_music!
+    @music.play unless @music.playing?
+  end
+  def drop_shape!
+    if Gosu::milliseconds - @last_drop > (@speed || 1000) then
+      Shape.active.move :down
+      @last_drop = Gosu::milliseconds
+    end
+  end
+  def game_over!
+    @music.stop
+    self.text_input = @text_inputs[0]
+    @gameover = true
+    @menu.disable_option(:resume_game)
+    @menu.selected = @menu.select(0,true)
+    @screen = :game_over
+  end
+  def pause!
+    @pause = true
+  end
+  def resume!
+    @pause = false
+  end
+  def draw
+    @background_image.draw(0, 0, 0);
+
+    if @screen == :game then
+      if @pause == false then
+        @grid.draw
+    
+        Shape.active.draw
+        Block.instances.each do |block|
+          block.draw if not Shape.active.blocks.include? block
+        end
+      else
+        draw_pause
+      end
+      draw_gui(:game)
+    elsif @screen == :menu then
+      draw_gui(:menu)
+    elsif @screen == :game_over then
+      draw_game_over
+    else
+      draw_gui(:hall_of_fame)
+    end
+  end
+  def update_background(num = 1)
+      @background_image = Gosu::Image.new(self, "media/menu.png", true)
+  end
+  def draw_gui(type = :menu)
+    case type
+      when :game:
+        draw_game_gui
+      when :menu:
+        @menu.draw
+      when :hall_of_fame:
+        @hall_of_fame.draw
+    end  
+    #@font20.draw("Blocks: #{Block.instances.size}", 10, 70, 1, 1.0, 1.0, 0xffffff00)
+  end
+  def draw_pause
+    @font20.draw("PAUSED",@width/2 - 80, @height/2 -20,1,2,2,0xffffff00)
+    @font20.draw("Press spacebar to resume",@width/2 - 150, @height/2 + 20,1,1.2,1.2,0xffffff00)
+  end
+  def draw_game_over
+    @font20.draw("GAME OVER!",@width/2 - 100, @height/2 -40,1,2,2,0xffffff00)
+    @font20.draw("Enter your name to save your record: ",@width/2 - 190, @height/2 + 20,1,1.1,1.1,0xffffff00)
+    @text_inputs[0].draw
+    @font20.draw("Press Esc to go back to menu",@width/2 - 100, @height/2 + 90,1,0.8,0.8,0xffffff00)
+  end
+  def draw_game_gui
+    @font20.draw("Score: #{@score}", 10, 10, 1, 1.0, 1.0, 0xffffff00)
+    @font14.draw("Level: #{@level}", 10, 30, 1, 1.0, 1.0, 0xffffff00)
+    #@font14.draw("Blocks: #{Block.instances.size}", 10, 50, 1, 1.0, 1.0, 0xffffff00)    
+  end
+
+  def menu!
+    pause!
+    self.text_input = nil
+    @screen = :menu
+    @menu.enable_option(:resume_game) unless @gameover == true
+  end
+  
+  def hall_of_fame!
+    pause!
+    @screen = :hall_of_fame
+  end
+  
+  def game!
+    resume!
+    @screen = :game    
+  end
+  def button_down(id)
+
+  end
+  def reset_game!
+    @music.play
+    update_background
+    @gameover = false
+    @pause = false
+    Shape.destroy_all
+    Block.destroy_all
+    @last_drop = Gosu::milliseconds
+    @last_rotation = Gosu::milliseconds
+    @last_move = Gosu::milliseconds
+    
+    @score = 0
+    @score_per_line = INITIAL_SCORE_PER_LINE
+    
+    @lines = 0
+    @level = 1
+    
+    @speed_per_level = Hash.new
+    initial_speed = INITIAL_SPEED
+    factor = 0.95
+    (1..20).each do |num|
+      @speed_per_level.merge!(num => (initial_speed *= factor).to_i)
+      factor *= 0.988
+    end
+    new_piece
+  end
+end
