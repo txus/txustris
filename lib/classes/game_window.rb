@@ -6,6 +6,7 @@ class GameWindow < Gosu::Window
     @height = h
     self.caption = "Txustris"
 
+    Settings.load
     # Create a GUI for score and other data to be displayed during the game
     @GUI = GUI.new
 
@@ -34,8 +35,9 @@ class GameWindow < Gosu::Window
 
     # Determine speed for each level according to ACCELERATION_FACTOR
     set_level_speeds
-
+    
   end
+
   def show
     
   end
@@ -43,6 +45,11 @@ class GameWindow < Gosu::Window
   private
 
   def set_level_speeds
-
+    initial_speed = INITIAL_SPEED
+    factor = 0.95
+    (1..20).each do |num|
+      #@speed_per_level.merge!(num => (initial_speed *= factor).to_i)
+      factor *= 0.988
+    end
   end
 end
