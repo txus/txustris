@@ -1,0 +1,14 @@
+<settings>
+  <setting>
+    <name>CONSTANT1</name>
+    <value>45</value>
+  </setting>
+  <setting>
+    <name>CONSTANT4</name>
+    <value>45999</value>
+  </setting>
+  <setting>
+    <name>CONSTANT7</name>
+    <value>332245</value>
+  </setting>
+</settings>
