@@ -1,7 +1,0 @@
-= txustris
-
-Description goes here.
-
-== Copyright
-
-Copyright (c) 2009 txusty. See LICENSE for details.
