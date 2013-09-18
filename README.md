@@ -1,7 +1,7 @@
 # txustris
 
 This is the very first Ruby code I wrote, back in 2008-2009. It is a clone of
-Tetris with an original soundtrack :) The code might sucks, but the game is
+Tetris with an original soundtrack :) The code might suck, but the game is
 fun!
 
 As of September 2013, I corrected its syntax so that it runs on Ruby 1.9/2.0
