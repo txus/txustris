@@ -1,4 +1,4 @@
-require 'rubygems'
+$: << '.'
 require 'gosu'
 require 'classes/piece_types'
 require 'classes/game_window'

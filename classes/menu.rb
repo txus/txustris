@@ -39,13 +39,13 @@ class Menu
           return available_options.dup[which]
         elsif which.is_a?(Symbol) then
           case which
-            when :first:
+            when :first
               @selected = available_options.first
-            when :next:
+            when :next
               @selected = select((selected_index + 1) % how_many?(available_options))
-            when :previous:
+            when :previous
               @selected = select((selected_index - 1) % how_many?(available_options))
-            when :last:
+            when :last
               @selected = available_options.last
           end
         end

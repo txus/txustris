@@ -147,14 +147,14 @@ class GameWindow < Gosu::Window
       end
       if button_down? Gosu::Button::KbSpace then
         case @menu.selected.first
-          when :resume_game:
+          when :resume_game
             @screen = :game
-          when :new_game:
+          when :new_game
             reset_game!
             @screen = :game
-          when :hall_of_fame:
+          when :hall_of_fame
             hall_of_fame!
-          when :exit:
+          when :exit
             close
         end
       end
@@ -232,11 +232,11 @@ class GameWindow < Gosu::Window
   end
   def draw_gui(type = :menu)
     case type
-      when :game:
+      when :game
         draw_game_gui
-      when :menu:
+      when :menu
         @menu.draw
-      when :hall_of_fame:
+      when :hall_of_fame
         @hall_of_fame.draw
     end  
     #@font20.draw("Blocks: #{Block.instances.size}", 10, 70, 1, 1.0, 1.0, 0xffffff00)

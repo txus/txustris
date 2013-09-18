@@ -59,9 +59,9 @@ class Shape
     
     if row.is_a?(Symbol) then
       case row
-        when :top:
+        when :top
           row = 0
-        when :middle:
+        when :middle
           row = @grid.rows/2
         else
           row = 0
@@ -69,9 +69,9 @@ class Shape
     end
     if column.is_a?(Symbol) then
       case column
-        when :left:
+        when :left
           column = 0
-        when :center:
+        when :center
           column = @grid.columns/2
         else
           column = @grid.columns/2
@@ -151,15 +151,15 @@ class Shape
   def move(direction)
     if Gosu::milliseconds - @window.last_move > @window.moving_speed then
       case direction
-        when :left:
+        when :left
           if fits? :left then
             @x -= BLOCK_SIZE
           end
-        when :right:
+        when :right
           if fits? :right then
             @x += BLOCK_SIZE
           end
-        when :down:
+        when :down
           if fits? :down then
             @y += BLOCK_SIZE
           end
@@ -177,11 +177,11 @@ class Shape
   def touches_border?(direction)
     @blocks.each do |block|
       case direction
-        when :left:
+        when :left
           return true if block.x - @grid.border_left < BLOCK_SIZE
-        when :right:
+        when :right
           return true if @grid.border_right - block.x <= BLOCK_SIZE
-        when :down:
+        when :down
           if @grid.border_bottom - block.y <= BLOCK_SIZE then
             @window.new_piece
             return true
@@ -194,15 +194,15 @@ class Shape
 
     @blocks.each do |block|
       case direction
-        when :left:
+        when :left
           @all_blocks.each do |other_block|
             return true if block.x > other_block.x and block.x - other_block.x <= BLOCK_SIZE and block.y == other_block.y
           end
-        when :right:
+        when :right
           @all_blocks.each do |other_block|
             return true if other_block.x > block.x and other_block.x - block.x <= BLOCK_SIZE and block.y == other_block.y
           end
-        when :down:
+        when :down
           @all_blocks.each do |other_block|
             if other_block.y > block.y and other_block.y - block.y <= BLOCK_SIZE and block.x == other_block.x then
               if block.y == @grid.y then
