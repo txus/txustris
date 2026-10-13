@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    gosu (1.4.6)
+
+PLATFORMS
+  arm64-darwin-25
+  ruby
+
+DEPENDENCIES
+  gosu
+
+CHECKSUMS
+  gosu (1.4.6) sha256=80c7fa48cf61f4960ef067fdd1c000d98b4adc8e11faeaa486543d00908a5c15
+
+BUNDLED WITH
+  4.0.11

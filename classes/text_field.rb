@@ -22,7 +22,7 @@ class TextField < Gosu::TextInput
     # background's color.
     background_color = ACTIVE_COLOR
 
-    @window.draw_quad(x - PADDING,         y - PADDING,          background_color,
+    Gosu.draw_quad(x - PADDING,         y - PADDING,          background_color,
                       x + width + PADDING, y - PADDING,          background_color,
                       x - PADDING,         y + height + PADDING, background_color,
                       x + width + PADDING, y + height + PADDING, background_color, 0)
@@ -33,17 +33,17 @@ class TextField < Gosu::TextInput
     
     # Draw the selection background, if any; if not, sel_x and pos_x will be
     # the same value, making this quad empty.
-    @window.draw_quad(sel_x, y,          SELECTION_COLOR,
+    Gosu.draw_quad(sel_x, y,          SELECTION_COLOR,
                       pos_x, y,          SELECTION_COLOR,
                       sel_x, y + height, SELECTION_COLOR,
                       pos_x, y + height, SELECTION_COLOR, 0)
 
     # Draw the caret; again, only if this is the currently selected field.
-    @window.draw_line(pos_x, y,          CARET_COLOR,
+    Gosu.draw_line(pos_x, y,          CARET_COLOR,
                         pos_x, y + height, CARET_COLOR, 0)
 
     # Finally, draw the text itself!
-    @font.draw(self.text, x, y, 0)
+    @font.draw_text(self.text, x, y, 0)
   end
 
   # This text field grows with the text that's being entered.

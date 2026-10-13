@@ -12,7 +12,7 @@ class Menu
   end
   
   def draw
-    @font.draw("Txustris",(@window.width / 3 + 20),@window.height/7,1,3,3,@title_color)
+    @font.draw_text("Txustris",(@window.width / 3 + 20),@window.height/7,1,3,3,@title_color)
     initial_menu_x = @window.width / 2.3
     initial_menu_y = @window.height/7 + 100
     x_offset = 0
@@ -24,14 +24,14 @@ class Menu
       y_offset += 30
       color = @option_color
       color = @selected_color if @selected == element
-      @font.draw(data,initial_menu_x + x_offset, initial_menu_y + y_offset, 1,1,1,color)
+      @font.draw_text(data,initial_menu_x + x_offset, initial_menu_y + y_offset, 1,1,1,color)
     end  
   end
   
   def select(which,force = false)
     if force == false then
       if (Gosu::milliseconds - @last_move > 100 )then
-        if which.is_a?(Fixnum) then
+        if which.is_a?(Integer) then
           @options.each do |option|
             option[4] = false
             option[4] = true if option[0] == available_options.dup[which][0]

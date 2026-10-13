@@ -20,21 +20,21 @@ class HallOfFame
 
   end
   def draw
-    @font.draw("Hall of fame",(@window.width / 3 + 20),@window.height/6,1,2,2,@title_color)
+    @font.draw_text("Hall of fame",(@window.width / 3 + 20),@window.height/6,1,2,2,@title_color)
     initial_hof_x = @window.width / 4
     initial_hof_y = @window.height/7 + 100
     x_offset = 0
     y_offset = 0
     tables_x = [initial_hof_x, initial_hof_x + 150, initial_hof_x + 300]
     
-    @font.draw("Name",tables_x[0],initial_hof_y -30,1,1,1,@label_color)
-    @font.draw("Level",tables_x[1],initial_hof_y -30,1,1,1,@label_color)
-    @font.draw("Score",tables_x[2],initial_hof_y -30,1,1,1,@label_color)
+    @font.draw_text("Name",tables_x[0],initial_hof_y -30,1,1,1,@label_color)
+    @font.draw_text("Level",tables_x[1],initial_hof_y -30,1,1,1,@label_color)
+    @font.draw_text("Score",tables_x[2],initial_hof_y -30,1,1,1,@label_color)
     
     @records.each do |record|
-      @font.draw(record.name,tables_x[0],initial_hof_y + y_offset,1,1,1,@element_color)
-      @font.draw(record.level,tables_x[1],initial_hof_y + y_offset,1,1,1,@element_color)
-      @font.draw(record.score,tables_x[2],initial_hof_y + y_offset,1,1,1,@element_color)      
+      @font.draw_text(record.name,tables_x[0],initial_hof_y + y_offset,1,1,1,@element_color)
+      @font.draw_text(record.level,tables_x[1],initial_hof_y + y_offset,1,1,1,@element_color)
+      @font.draw_text(record.score,tables_x[2],initial_hof_y + y_offset,1,1,1,@element_color)      
       y_offset += 20
     end
   end

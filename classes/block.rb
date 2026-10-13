@@ -9,7 +9,7 @@ class Block
     @rownum = rownum
     @x = parent_x + @colnum * @width
     @y = parent_y + @rownum * @height
-    @img = Gosu::Image.new(window,"media/block.png",true)
+    @img = Gosu::Image.new("media/block.png", tileable: true)
     @fake = false
     
     

@@ -15,7 +15,7 @@ class Grid
     @color.green = 60
     @color.blue = 60
     @window = window
-    @img = Gosu::Image.new(window,"media/block.png",true)
+    @img = Gosu::Image.new("media/block.png", tileable: true)
   end
   def draw
     rowindex = 0

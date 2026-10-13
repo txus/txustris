@@ -1,7 +1,7 @@
 class GameWindow < Gosu::Window
   attr_accessor :last_drop, :last_rotation, :rotation_speed, :moving_speed, :last_move, :moving_speed, :score, :lines, :beep
   def initialize(w = 640, h = 480)
-    super(w, h, false, 20)
+    super(w, h, fullscreen: false, update_interval: 20)
     @width = w
     @height = h
     
@@ -38,9 +38,9 @@ class GameWindow < Gosu::Window
     @menu_color_selected.blue = 50
     @menu_color_selected.green = 140
     
-    @font35 = Gosu::Font.new(self, Gosu::default_font_name, 35)
-    @font20 = Gosu::Font.new(self, Gosu::default_font_name, 20)
-    @font14 = Gosu::Font.new(self, Gosu::default_font_name, 14)
+    @font35 = Gosu::Font.new(35)
+    @font20 = Gosu::Font.new(20)
+    @font14 = Gosu::Font.new(14)
     
     
     menu_options = [[:resume_game, "Resume game",false,false],
@@ -56,8 +56,8 @@ class GameWindow < Gosu::Window
 
     @text_inputs << TextField.new(self,@font20,@width/2 - 100, @height/2 + 50)
 
-    @beep = Gosu::Sample.new(self, "media/beep.aif")
-    @music = Gosu::Song.new(self, "media/txustris.ogg")
+    @beep = Gosu::Sample.new("media/beep.aif")
+    @music = Gosu::Song.new("media/txustris.ogg")
 
     @screen = :menu
     
@@ -83,7 +83,7 @@ class GameWindow < Gosu::Window
     @grid.check_lines
     Shape.active.destroy if Shape.active
     a = Shape.new(self,@grid,
-                   PIECE_TYPES[rand(0-PIECE_TYPES.size)],
+                   PIECE_TYPES[rand(PIECE_TYPES.size)],
                      :blue)
     a.warp :top, :middle
     a.active!
@@ -109,20 +109,20 @@ class GameWindow < Gosu::Window
   def update
     if @screen == :game then
       unless @pause == true then
-        if button_down? Gosu::Button::KbLeft or button_down? Gosu::Button::GpLeft then
+        if button_down? Gosu::KB_LEFT or button_down? Gosu::GP_LEFT then
           Shape.active.move :left
         end
-        if button_down? Gosu::Button::KbRight or button_down? Gosu::Button::GpRight then
+        if button_down? Gosu::KB_RIGHT or button_down? Gosu::GP_RIGHT then
           Shape.active.move :right
     	  end
-        if button_down? Gosu::Button::KbUp or button_down? Gosu::Button::GpButton0 then
+        if button_down? Gosu::KB_UP or button_down? Gosu::GP_BUTTON_0 then
           Shape.active.rotate
         end
-        if button_down? Gosu::Button::KbDown then
+        if button_down? Gosu::KB_DOWN then
           Shape.active.move :down
         end
       end
-      if button_down? Gosu::Button::KbSpace then
+      if button_down? Gosu::KB_SPACE then
         if Gosu::milliseconds - @last_space > 500 then
           if @pause == true then
             resume!
@@ -132,20 +132,20 @@ class GameWindow < Gosu::Window
           @last_space = Gosu::milliseconds
         end
       end
-      if button_down? Gosu::Button::KbEscape
+      if button_down? Gosu::KB_ESCAPE
         if Gosu::milliseconds - @last_esc > 500 then
           menu!
           @last_esc = Gosu::milliseconds
         end
       end
     elsif @screen == :menu then
-      if button_down? Gosu::Button::KbUp or button_down? Gosu::Button::GpButton0 then
+      if button_down? Gosu::KB_UP or button_down? Gosu::GP_BUTTON_0 then
         @menu.select(:previous)
       end
-      if button_down? Gosu::Button::KbDown then
+      if button_down? Gosu::KB_DOWN then
         @menu.select(:next)
       end
-      if button_down? Gosu::Button::KbSpace then
+      if button_down? Gosu::KB_SPACE then
         case @menu.selected.first
           when :resume_game
             @screen = :game
@@ -160,7 +160,7 @@ class GameWindow < Gosu::Window
       end
     elsif @screen == :game_over then
 
-      if button_down? Gosu::Button::KbEscape then
+      if button_down? Gosu::KB_ESCAPE then
         if Gosu::milliseconds - @last_esc > 500 then
           @name = self.text_input.text
           @hall_of_fame.new_record(@name, @score, @level)
@@ -169,7 +169,7 @@ class GameWindow < Gosu::Window
         end
       end
     else
-      if button_down? Gosu::Button::KbEscape
+      if button_down? Gosu::KB_ESCAPE
         if Gosu::milliseconds - @last_esc > 500 then
           menu!
           @last_esc = Gosu::milliseconds
@@ -228,7 +228,7 @@ class GameWindow < Gosu::Window
     end
   end
   def update_background(num = 1)
-      @background_image = Gosu::Image.new(self, "media/menu.png", true)
+      @background_image = Gosu::Image.new("media/menu.png", tileable: true)
   end
   def draw_gui(type = :menu)
     case type
@@ -239,22 +239,22 @@ class GameWindow < Gosu::Window
       when :hall_of_fame
         @hall_of_fame.draw
     end  
-    #@font20.draw("Blocks: #{Block.instances.size}", 10, 70, 1, 1.0, 1.0, 0xffffff00)
+    #@font20.draw_text("Blocks: #{Block.instances.size}", 10, 70, 1, 1.0, 1.0, 0xffffff00)
   end
   def draw_pause
-    @font20.draw("PAUSED",@width/2 - 80, @height/2 -20,1,2,2,0xffffff00)
-    @font20.draw("Press spacebar to resume",@width/2 - 150, @height/2 + 20,1,1.2,1.2,0xffffff00)
+    @font20.draw_text("PAUSED",@width/2 - 80, @height/2 -20,1,2,2,0xffffff00)
+    @font20.draw_text("Press spacebar to resume",@width/2 - 150, @height/2 + 20,1,1.2,1.2,0xffffff00)
   end
   def draw_game_over
-    @font20.draw("GAME OVER!",@width/2 - 100, @height/2 -40,1,2,2,0xffffff00)
-    @font20.draw("Enter your name to save your record: ",@width/2 - 190, @height/2 + 20,1,1.1,1.1,0xffffff00)
+    @font20.draw_text("GAME OVER!",@width/2 - 100, @height/2 -40,1,2,2,0xffffff00)
+    @font20.draw_text("Enter your name to save your record: ",@width/2 - 190, @height/2 + 20,1,1.1,1.1,0xffffff00)
     @text_inputs[0].draw
-    @font20.draw("Press Esc to go back to menu",@width/2 - 100, @height/2 + 90,1,0.8,0.8,0xffffff00)
+    @font20.draw_text("Press Esc to go back to menu",@width/2 - 100, @height/2 + 90,1,0.8,0.8,0xffffff00)
   end
   def draw_game_gui
-    @font20.draw("Score: #{@score}", 10, 10, 1, 1.0, 1.0, 0xffffff00)
-    @font14.draw("Level: #{@level}", 10, 30, 1, 1.0, 1.0, 0xffffff00)
-    #@font14.draw("Blocks: #{Block.instances.size}", 10, 50, 1, 1.0, 1.0, 0xffffff00)    
+    @font20.draw_text("Score: #{@score}", 10, 10, 1, 1.0, 1.0, 0xffffff00)
+    @font14.draw_text("Level: #{@level}", 10, 30, 1, 1.0, 1.0, 0xffffff00)
+    #@font14.draw_text("Blocks: #{Block.instances.size}", 10, 50, 1, 1.0, 1.0, 0xffffff00)    
   end
 
   def menu!

@@ -13,9 +13,9 @@ class Shape
     @x, @y = grid.x + 2*BLOCK_SIZE, grid.y + 2*BLOCK_SIZE
     
     @color = Gosu::Color.new(0xff000000)
-    @color.red = (rand (0-215)) + 40
-    @color.green = (rand (0-215)) + 40
-    @color.blue = (rand (0-215)) + 40
+    @color.red = (rand(215)) + 40
+    @color.green = (rand(215)) + 40
+    @color.blue = (rand(215)) + 40
     
     rownum = 0
     @blocks = Array.new
